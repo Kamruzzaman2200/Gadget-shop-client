@@ -1,7 +1,15 @@
+/* eslint-disable no-unused-vars */
+
 import { Link } from "react-router-dom"
+import useAuth from "../hooks/useAuth"
+import { useForm } from "react-hook-form"
+
 
 
 const Register = () => {
+  const {CreateUser} =useAuth()
+  const {register,handleSubmit,watch,formState:errors} = useForm()
+ 
   return (
     <div className="hero bg-base-200 min-h-screen">
   <div className="hero-content flex-col lg:flex-row-reverse">
@@ -18,13 +26,28 @@ const Register = () => {
           <label className="label">
             <span className="label-text">Email</span>
           </label>
-          <input type="email" placeholder="email" className="input input-bordered" required />
+          <input type="email" placeholder="email" className="input input-bordered" 
+          {...register("email",{required:true})} 
+          
+           />
+           {errors.email && (<p className="text-red-500">Email is required</p>)}
         </div>
         <div className="form-control">
           <label className="label">
             <span className="label-text">Password</span>
           </label>
-          <input type="password" placeholder="password" className="input input-bordered" required />
+          <input type="password" placeholder="password" className="input input-bordered" 
+          {...register("password",{required:true,
+            minLength:6
+          })}
+          
+          />
+          {errors.password ?.type === "required" && (
+          <p className="text-red-500">Password is required</p>)
+          }
+           {errors.password ?.type === "minLength" && (
+          <p className="text-red-500">Password must have at least 6 characters</p>)
+          }
          
         </div>
         <div className="form-control">

@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { app } from "./../firebase-config/firebase";
 import {
   getAuth,
@@ -8,12 +9,13 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  onAuthStateChanged,
 } from "firebase/auth";
 
 export const AuthContext = createContext(null);
 const auth = getAuth(app);
 
-const AuthProvider = () => {
+const AuthProvider = ({ children }) => {
   // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,15 +41,27 @@ const AuthProvider = () => {
     return signInWithPopup(auth, googleProvider);
   };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   // eslint-disable-next-line no-unused-vars
   const authInfo = {
+    user,
+    loading,
     CreateUser,
     Login,
     logout,
     GoogleLogin,
   };
 
-  return <div>AuthProvider</div>;
+  return <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;
